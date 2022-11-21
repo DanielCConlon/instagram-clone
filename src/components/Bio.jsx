@@ -2,7 +2,8 @@ import React from 'react';
 import profileIcon from '../assets/profileIcon.svg';
 import { useState } from 'react';
 import getPhotoUrl from 'get-photo-url';
-
+import { db } from '../dexie'
+import { useEffect } from 'react';
 
 const Bio = () => {
 
@@ -15,12 +16,28 @@ const Bio = () => {
     const [editFormIsOpen, setEditFormIsOpen] = useState(false);
     const [profilePhoto, setProfilePhoto] = useState(profileIcon);
 
-    const updateUserDetails= (event) => {
+    useEffect(() => {
+        const setDataFromdb = async () => {
+            const userDetailsFromDb = await db.bio.get('info');
+            const profilePhotoFromDb = await db.bio.get('profilePhoto');
+            userDetailsFromDb && setUserDetails(userDetailsFromDb);
+            profilePhotoFromDb && setProfilePhoto(profilePhotoFromDb)
+        }
+
+        setDataFromdb()
+    })
+
+    const updateUserDetails= async (event) => {
         event.preventDefault()
-        setUserDetails({
+
+        const objectData = {
             name: event.target.nameOfUser.value,
             about: event.target.aboutUser.value
-        })
+        }
+
+        setUserDetails(objectData)
+
+        await db.bio.put(objectData, 'info')
 
         setEditFormIsOpen(false);
     };
@@ -28,12 +45,14 @@ const Bio = () => {
     const updateProfilePhoto = async () => {
         const newProfilePhoto = await getPhotoUrl('#profilePhotoInput');
         setProfilePhoto(newProfilePhoto);
+
+        await db.bio.put(newProfilePhoto, 'profilePhoto')
     }
 
     const editForm = (
         <form className='edit-bio-form' onSubmit={ (e) => updateUserDetails(e) }>
-            <input type="text" id='' name='nameOfUser' placeholder='Your name'></input>
-            <input type="text" id='' name='aboutUser' placeholder='About you'></input>
+            <input type="text" id='' name='nameOfUser' defaultValue={userDetails?.name} placeholder='Your name'></input>
+            <input type="text" id='' name='aboutUser' defaultValue={userDetails?.about} placeholder='About you'></input>
 
             <br />
 

@@ -1,17 +1,22 @@
-import { useState } from 'react';
+import React from 'react';
 import getPhotoUrl from 'get-photo-url';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../dexie';
 
 const Gallery = () => {
 
-    const [allPhotos, setAllPhotos] = useState([]);
+    // const [allPhotos, setAllPhotos] = useState([]);
+    const allPhotos = useLiveQuery(() => db.gallery.toArray(), []);
 
     const addPhoto = async () => {
-        const newPhoto = {
-            id: Date.now(),
-            url: await getPhotoUrl('#addPhotoInput')
-        }
+        db.gallery.add({
+            url: await getPhotoUrl('#addPhotoInput'),
 
-        setAllPhotos([newPhoto, ...allPhotos]);
+        })
+    }
+
+    const removePhoto = (id) => {
+        db.gallery.delete(id);
     }
 
     return (
@@ -22,11 +27,12 @@ const Gallery = () => {
             </label>
 
             <section className='gallery'>
+                {!allPhotos && <p>Loading...</p>}
 
-                {allPhotos.map(photo => (
+                {allPhotos?.map(photo => (
                     <div className="item" key={photo.id}>
                         <img src={photo.url} className="item-image" alt=""></img>
-                        <button className='delete-button'>Delete</button>
+                        <button className='delete-button' onClick={() => removePhoto(photo.id)}>Delete</button>
                     </div>
                 ))}
 
