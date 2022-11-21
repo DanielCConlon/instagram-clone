@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { Nav, Bio } from './components';
+import { Nav, Bio, Gallery } from './components';
 
 
 function App() {
@@ -13,6 +13,7 @@ function App() {
       <Nav />
       <div className="conatiner">
         <Bio />
+        <Gallery />
       </div>
     </>
   );
