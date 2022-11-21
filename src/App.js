@@ -1,5 +1,6 @@
+import React from 'react';
 import './App.css';
-import Nav from './components/Nav';
+import { Nav, Bio } from './components';
 
 
 function App() {
@@ -7,9 +8,13 @@ function App() {
 
 
   return (
-    <div className="App">
+    // <> is a react fragment - allows you to return multiple elements
+    <>
       <Nav />
-    </div>
+      <div className="conatiner">
+        <Bio />
+      </div>
+    </>
   );
 }
 
